@@ -3548,7 +3548,7 @@ document.addEventListener('keydown', e => {
 // ═══════════════════════════════════════
 // AUTO-UPDATE CHECK
 // ═══════════════════════════════════════
-const CURRENT_VERSION = '4.1.0';
+const CURRENT_VERSION = '4.0.0';
 const UPDATE_REPO = 'RP4031-FR/CristalCaisse';
 const UPDATE_CHECK_URL = `https://api.github.com/repos/${UPDATE_REPO}/releases/latest`;
 
@@ -3568,7 +3568,8 @@ async function checkForUpdate(silent = true) {
     const res = await fetch(UPDATE_CHECK_URL, { cache: 'no-store' });
     if (!res.ok) throw new Error('API GitHub indisponible');
     const data = await res.json();
-    const latest = (data.tag_name || '').replace(/^v/i, '');
+    const match = (data.tag_name || '').match(/\d+(\.\d+)*/);
+    const latest = match ? match[0] : '';
     if (!latest) throw new Error('Pas de version trouvée');
 
     if (compareVersions(latest, CURRENT_VERSION) > 0) {
@@ -3602,42 +3603,22 @@ function showUpdateBanner(version, downloadUrl, releaseUrl) {
   document.getElementById('update-now-btn').onclick = () => {
     confirmAction(
       'Mettre à jour CristalCaisse',
-      'La version ' + version + ' va être téléchargée puis ouverte dans un nouvel onglet. Si cet onglet-ci ne se ferme pas automatiquement, fermez-le vous-même.',
+      'La version ' + version + ' va être téléchargée dans votre dossier Téléchargements. Ouvrez-la ensuite, puis fermez cet onglet.',
       () => performUpdate(downloadUrl, releaseUrl, version)
     );
   };
 }
 
-async function performUpdate(downloadUrl, releaseUrl, version) {
-  if (!downloadUrl) {
-    window.open(releaseUrl, '_blank');
-    toast('Téléchargez le fichier depuis la page qui vient de s\'ouvrir', 'success');
-    return;
-  }
-  try {
-    toast('Téléchargement de la version ' + version + '…', 'success');
-    const res = await fetch(downloadUrl);
-    if (!res.ok) throw new Error('Échec du téléchargement');
-    const blob = await res.blob();
-
-    const fileUrl = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = fileUrl; a.download = 'CristalCaisse_v' + version + '.html';
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-
-    const htmlUrl = URL.createObjectURL(new Blob([blob], { type: 'text/html' }));
-    window.open(htmlUrl, '_blank');
-
-    setTimeout(() => {
-      window.close();
-      toast('Fermez cet onglet manuellement pour terminer', 'success');
-    }, 800);
-
-  } catch (e) {
-    toast('Échec de la mise à jour : ' + e.message, 'error');
-  }
+function performUpdate(downloadUrl, releaseUrl, version) {
+  const a = document.createElement('a');
+  a.href = downloadUrl || releaseUrl;
+  a.target = '_blank';
+  a.rel = 'noopener';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  toast('Téléchargement de la version ' + version + ' lancé', 'success');
+  setTimeout(() => toast('Ouvrez le fichier téléchargé, puis fermez cet onglet', 'success'), 1500);
 }
-
+CURRENT_VERSION = '4.1.0'
 document.addEventListener('DOMContentLoaded', () => {
   if (navigator.onLine) checkForUpdate(true);
 });

@@ -1,0 +1,53 @@
+{
+  "name": "cristalcaisse",
+  "version": "4.1.0",
+  "description": "CristalCaisse - caisse enregistreuse simple et rapide",
+  "main": "main.js",
+  "author": "RP4031-FR",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux",
+    "publish": "electron-builder --publish always"
+  },
+  "build": {
+    "appId": "fr.rp4031.cristalcaisse",
+    "productName": "CristalCaisse",
+    "files": [
+      "main.js",
+      "index.html"
+    ],
+    "directories": {
+      "buildResources": "build"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "mac": {
+      "target": "dmg",
+      "category": "public.app-category.business"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Office"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "RP4031-FR",
+      "repo": "CristalCaisse"
+    }
+  },
+  "devDependencies": {
+    "electron": "^45.0.0",
+    "electron-builder": "^26.18.0"
+  },
+  "dependencies": {
+    "electron-updater": "^6.8.11"
+  }
+}

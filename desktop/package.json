@@ -1,9 +1,10 @@
 {
   "name": "cristalcaisse",
-  "version": "4.1.0",
+  "version": "4.1.1",
   "description": "CristalCaisse - caisse enregistreuse simple et rapide",
   "main": "main.js",
-  "author": "RP4031-FR",
+  "author": { "name": "RP4031-FR", "email": "nah" },
+  "homepage": "https://github.com/RP4031-FR/CristalCaisse",
   "license": "MIT",
   "scripts": {
     "start": "electron .",

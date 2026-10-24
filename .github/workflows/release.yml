@@ -1,0 +1,43 @@
+name: Publier CristalCaisse (Windows, macOS, Linux)
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: desktop
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - name: Windows
+        if: matrix.os == 'windows-latest'
+        run: npx electron-builder --win --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: macOS
+        if: matrix.os == 'macos-latest'
+        run: npx electron-builder --mac --x64 --arm64 --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - name: Linux
+        if: matrix.os == 'ubuntu-latest'
+        run: npx electron-builder --linux --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
